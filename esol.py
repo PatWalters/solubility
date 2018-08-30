@@ -37,7 +37,7 @@ class ESOLCalculator:
 
     def calc_esol_orig(self, mol):
         """
-        Original parameter from the Delaney paper, just here for comparison
+        Original parameters from the Delaney paper, just here for comparison
         :param mol: input molecule
         :return: predicted solubility
         """
