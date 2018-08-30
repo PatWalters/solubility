@@ -82,21 +82,27 @@ def test_on_dls_100():
     df.to_csv("dls_100.csv", index=False)
 
 
+def add_esol_descriptors_to_dataframe(df):
+    esol_calculator = ESOLCalculator()
+    PandasTools.AddMoleculeColumnToFrame(df, 'SMILES', 'Molecule', includeFingerprints=False)
+    result_list = []
+    for name, mol in df[["Compound ID", "Molecule"]].values:
+        desc = esol_calculator.calc_esol_descriptors(mol)
+        result_list.append([name,desc.mw,desc.logp,desc.rotors,desc.ap])
+    result_df = pd.DataFrame(result_list)
+    descriptor_cols = ["MW", "Logp", "Rotors", "AP"]
+    result_df.columns = ["Compound ID"] + descriptor_cols
+    df = df.merge(result_df, on="Compound ID")
+    return df, descriptor_cols
+
+
 def refit_esol():
     """
     Refit the parameters for ESOL using multiple linear regression
     :return: None
     """
-    esol_calculator = ESOLCalculator()
     df = pd.read_csv("delaney.csv")
-    PandasTools.AddMoleculeColumnToFrame(df, 'SMILES', 'Molecule', includeFingerprints=False)
-    result_list = []
-    for name, mol in df[["Compound ID", "Molecule"]].values:
-        result_list.append([name] + list(esol_calculator.calc_esol_descriptors(mol)))
-    result_df = pd.DataFrame(result_list)
-    descriptor_cols = ["LogP", "MW", "Rotors", "AP"]
-    result_df.columns = ["Compound ID"] + descriptor_cols
-    df = df.merge(result_df, on="Compound ID")
+    df, descriptor_cols = add_esol_descriptors_to_dataframe(df)
     x = df[descriptor_cols]
     y = df[["ESOL predicted log(solubility:mol/L)"]]
 
@@ -126,4 +132,4 @@ def demo():
 
 
 if __name__ == "__main__":
-    test_on_dls_100()
+    refit_esol()
