@@ -15,10 +15,20 @@ class ESOLCalculator:
         self.Descriptor = namedtuple("Descriptor", "mw logp rotors ap")
 
     def calc_ap(self, mol):
+        """
+        Calculate aromatic proportion #aromatic atoms/#atoms total
+        :param mol: input molecule
+        :return: aromatic proportion
+        """
         matches = mol.GetSubstructMatches(self.aromatic_query)
         return len(matches) / mol.GetNumAtoms()
 
     def calc_esol_descriptors(self, mol):
+        """
+        Calcuate mw,logp,rotors and aromatic proportion (ap)
+        :param mol: input molecule
+        :return: named tuple with descriptor values
+        """
         mw = Descriptors.MolWt(mol)
         logp = Crippen.MolLogP(mol)
         rotors = Lipinski.NumRotatableBonds(mol)
@@ -26,6 +36,11 @@ class ESOLCalculator:
         return self.Descriptor(mw=mw, logp=logp, rotors=rotors, ap=ap)
 
     def calc_esol_orig(self, mol):
+        """
+        Original parameter from the Delaney paper, just here for comparison
+        :param mol: input molecule
+        :return: predicted solubility
+        """
         # just here as a reference don't use this!
         intercept = 0.16
         coef = {"logp": -0.63, "mw": -0.0062, "rotors": 0.066, "ap": -0.74}
@@ -35,6 +50,12 @@ class ESOLCalculator:
         return esol
 
     def calc_esol(self, mol):
+        """
+        Calculate ESOL based on descriptors in the Delaney paper, coefficients refit for the RDKit using the
+        routine refit_esol below
+        :param mol: input molecule
+        :return: predicted solubility
+        """
         intercept = -0.01216474
         coef = {"logp": -0.65685286, "mw": -0.00507685, "rotors": -0.01468901, "ap": -0.82973045}
         desc = self.calc_esol_descriptors(mol)
@@ -43,7 +64,11 @@ class ESOLCalculator:
         return esol
 
 
-def refit_ESOL():
+def refit_esol():
+    """
+    Refit the parameters for ESOL using multiple linear regression
+    :return: None
+    """
     esol_calculator = ESOLCalculator()
     df = pd.read_csv("delaney.csv")
     PandasTools.AddMoleculeColumnToFrame(df, 'SMILES', 'Molecule', includeFingerprints=False)
@@ -59,20 +84,28 @@ def refit_ESOL():
 
     model = LinearRegression()
     model.fit(x, y)
-    print(model.coef_)
-    print(model.intercept_)
+    coefficient_dict = {}
+    for name, coef in zip(descriptor_cols, model.coef_[0]):
+        coefficient_dict[name.lower()] = coef
+    print("Intercept = ", model.intercept_[0])
+    print("Coefficients =", coefficient_dict)
 
 
-if __name__ == "__main__":
+def demo():
+    """
+    Read the csv file from the Delaney supporting information, calculate ESOL using the data file from the
+    supporting material using the original and refit coefficients.  Write a csv file comparing with experiment.
+    :return:
+    """
     esol_calculator = ESOLCalculator()
     df = pd.read_csv("delaney.csv")
     PandasTools.AddMoleculeColumnToFrame(df, 'SMILES', 'Molecule', includeFingerprints=False)
     res = []
-    for mol,val in df[["Molecule","ESOL predicted log(solubility:mol/L)"]].values:
-        res.append([val,esol_calculator.calc_esol(mol),esol_calculator.calc_esol_orig(mol)])
-    output_df = pd.DataFrame(res,columns=["Experiment","Current","Original"])
+    for mol, val in df[["Molecule", "ESOL predicted log(solubility:mol/L)"]].values:
+        res.append([val, esol_calculator.calc_esol(mol), esol_calculator.calc_esol_orig(mol)])
+    output_df = pd.DataFrame(res, columns=["Experiment", "Current", "Original"])
     output_df.to_csv('validation.csv')
 
 
-
-
+if __name__ == "__main__":
+    demo()
