@@ -64,6 +64,24 @@ class ESOLCalculator:
         return esol
 
 
+def test_on_dls_100():
+    """
+    Test on the dls_100 dataset from the University of St Andrews
+    https://doi.org/10.17630/3a3a5abc-8458-4924-8e6c-b804347605e8
+    This function downloads the Excel spreadhsheet from St Andrews, does the
+    :return: None
+    """
+    esol_calculator = ESOLCalculator()
+    df = pd.read_excel("https://risweb.st-andrews.ac.uk/portal/files/251452157/dls_100.xlsx")
+    df.dropna(inplace=True)
+    PandasTools.AddMoleculeColumnToFrame(df, 'SMILES', 'Molecule', includeFingerprints=False)
+    res = []
+    for mol, name, logS in df[["Molecule", "Chemical name", "LogS exp (mol/L)"]].values:
+        res.append([name, logS, esol_calculator.calc_esol(mol)])
+    df = pd.DataFrame(res, columns=["Name", "Experimental LogS", "ESol LogS"])
+    df.to_csv("dls_100.csv", index=False)
+
+
 def refit_esol():
     """
     Refit the parameters for ESOL using multiple linear regression
@@ -103,9 +121,9 @@ def demo():
     res = []
     for mol, val in df[["Molecule", "ESOL predicted log(solubility:mol/L)"]].values:
         res.append([val, esol_calculator.calc_esol(mol), esol_calculator.calc_esol_orig(mol)])
-    output_df = pd.DataFrame(res, columns=["Experiment", "Current", "Original"])
-    output_df.to_csv('validation.csv')
+    output_df = pd.DataFrame(res, columns=["Experiment", "ESOL Current", "ESOL Original"])
+    output_df.to_csv('validation.csv',index=False)
 
 
 if __name__ == "__main__":
-    demo()
+    test_on_dls_100()
