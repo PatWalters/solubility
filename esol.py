@@ -105,7 +105,6 @@ def refit_esol(truth_col):
     df, descriptor_cols = add_esol_descriptors_to_dataframe(df)
     x = df[descriptor_cols]
     y = df[[truth_col]]
-    print(y)
 
     model = LinearRegression()
     model.fit(x, y)
@@ -131,10 +130,12 @@ def demo(truth_col):
     output_df = pd.DataFrame(res, columns=["Experiment", "ESOL Current", "ESOL Original"])
     output_df.to_csv('validation.csv',index=False)
 
+
 def main():
     truth_col = "measured log(solubility:mol/L)"
     refit_esol(truth_col)
     demo(truth_col)
+
 
 if __name__ == "__main__":
     main()
