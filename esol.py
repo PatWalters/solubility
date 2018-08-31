@@ -82,21 +82,21 @@ def test_on_dls_100():
     df.to_csv("dls_100.csv", index=False)
 
 
-def add_esol_descriptors_to_dataframe(df):
+def add_esol_descriptors_to_dataframe(df,smiles_col="SMILES",name_col="Compound ID"):
     esol_calculator = ESOLCalculator()
-    PandasTools.AddMoleculeColumnToFrame(df, 'SMILES', 'Molecule', includeFingerprints=False)
+    PandasTools.AddMoleculeColumnToFrame(df, smiles_col, 'Molecule', includeFingerprints=False)
     result_list = []
-    for name, mol in df[["Compound ID", "Molecule"]].values:
+    for name, mol in df[[name_col, "Molecule"]].values:
         desc = esol_calculator.calc_esol_descriptors(mol)
         result_list.append([name,desc.mw,desc.logp,desc.rotors,desc.ap])
     result_df = pd.DataFrame(result_list)
     descriptor_cols = ["MW", "Logp", "Rotors", "AP"]
-    result_df.columns = ["Compound ID"] + descriptor_cols
-    df = df.merge(result_df, on="Compound ID")
+    result_df.columns = [name_col] + descriptor_cols
+    df = df.merge(result_df, on=name_col)
     return df, descriptor_cols
 
 
-def refit_esol():
+def refit_esol(truth_col):
     """
     Refit the parameters for ESOL using multiple linear regression
     :return: None
@@ -104,7 +104,8 @@ def refit_esol():
     df = pd.read_csv("delaney.csv")
     df, descriptor_cols = add_esol_descriptors_to_dataframe(df)
     x = df[descriptor_cols]
-    y = df[["measured log(solubility:mol/L)"]]
+    y = df[[truth_col]]
+    print(y)
 
     model = LinearRegression()
     model.fit(x, y)
@@ -115,7 +116,7 @@ def refit_esol():
     print("Coefficients =", coefficient_dict)
 
 
-def demo():
+def demo(truth_col):
     """
     Read the csv file from the Delaney supporting information, calculate ESOL using the data file from the
     supporting material using the original and refit coefficients.  Write a csv file comparing with experiment.
@@ -125,11 +126,15 @@ def demo():
     df = pd.read_csv("delaney.csv")
     PandasTools.AddMoleculeColumnToFrame(df, 'SMILES', 'Molecule', includeFingerprints=False)
     res = []
-    for mol, val in df[["Molecule", "measured log(solubility:mol/L)"]].values:
+    for mol, val in df[["Molecule", truth_col]].values:
         res.append([val, esol_calculator.calc_esol(mol), esol_calculator.calc_esol_orig(mol)])
     output_df = pd.DataFrame(res, columns=["Experiment", "ESOL Current", "ESOL Original"])
     output_df.to_csv('validation.csv',index=False)
 
+def main():
+    truth_col = "measured log(solubility:mol/L)"
+    refit_esol(truth_col)
+    demo(truth_col)
 
 if __name__ == "__main__":
-    demo()
+    main()
