@@ -111,8 +111,8 @@ def refit_esol(truth_col):
     coefficient_dict = {}
     for name, coef in zip(descriptor_cols, model.coef_[0]):
         coefficient_dict[name.lower()] = coef
-    print("Intercept = ", model.intercept_[0])
-    print("Coefficients =", coefficient_dict)
+    print("intercept = ", model.intercept_[0])
+    print("coef =", coefficient_dict)
 
 
 def demo(truth_col):
