@@ -56,8 +56,8 @@ class ESOLCalculator:
         :param mol: input molecule
         :return: predicted solubility
         """
-        intercept = -0.01216474
-        coef = {"logp": -0.65685286, "mw": -0.00507685, "rotors": -0.01468901, "ap": -0.82973045}
+        intercept = 0.26121066137801696
+        coef = {'mw': -0.0066138847738667125, 'logp': -0.7416739523408995, 'rotors': 0.003451545565957996, 'ap': -0.42624840441316975}
         desc = self.calc_esol_descriptors(mol)
         esol = intercept + coef["logp"] * desc.logp + coef["mw"] * desc.mw + coef["rotors"] * desc.rotors \
                + coef["ap"] * desc.ap
@@ -104,7 +104,7 @@ def refit_esol():
     df = pd.read_csv("delaney.csv")
     df, descriptor_cols = add_esol_descriptors_to_dataframe(df)
     x = df[descriptor_cols]
-    y = df[["ESOL predicted log(solubility:mol/L)"]]
+    y = df[["measured log(solubility:mol/L)"]]
 
     model = LinearRegression()
     model.fit(x, y)
@@ -125,11 +125,11 @@ def demo():
     df = pd.read_csv("delaney.csv")
     PandasTools.AddMoleculeColumnToFrame(df, 'SMILES', 'Molecule', includeFingerprints=False)
     res = []
-    for mol, val in df[["Molecule", "ESOL predicted log(solubility:mol/L)"]].values:
+    for mol, val in df[["Molecule", "measured log(solubility:mol/L)"]].values:
         res.append([val, esol_calculator.calc_esol(mol), esol_calculator.calc_esol_orig(mol)])
     output_df = pd.DataFrame(res, columns=["Experiment", "ESOL Current", "ESOL Original"])
     output_df.to_csv('validation.csv',index=False)
 
 
 if __name__ == "__main__":
-    refit_esol()
+    demo()
