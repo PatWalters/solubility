@@ -21,3 +21,12 @@ See the [DeepChem](https://github.com/deepchem/deepchem) site for installation i
 ```
 pip install matplotlib scipy
 ```
+
+The repo also contains 2 datafiles. 
+
+* delaney.csv - a csv file with data from the supporting material for [https://pubs.acs.org/doi/abs/10.1021/ci034243x](https://pubs.acs.org/doi/abs/10.1021/ci034243x)
+* dls_100_unique.csv - csv file with solubility data for 56 compounds not in the delaney.csv.  Note that the original file from the
+University of St Andrews [https://doi.org/10.17630/3a3a5abc-8458-4924-8e6c-b804347605e8](https://doi.org/10.17630/3a3a5abc-8458-4924-8e6c-b804347605e8) 
+has 102 compounds, 46 of which are duplicated in delaney.csv.   
+ 
+
