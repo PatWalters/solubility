@@ -1,8 +1,11 @@
+#!/usr/bin/env python
+
 import pandas as pd
 from scipy.stats import norm, pearsonr
 import math
 import numpy as np
 import matplotlib.pyplot as plt
+plt.switch_backend("agg")
 
 
 def pearson_confidence(r, num, interval=0.95):
