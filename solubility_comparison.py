@@ -97,6 +97,7 @@ def calc_esol(input_file_name, smiles_col="SMILES"):
 def main():
     training_file_name = "delaney.csv"
     validation_file_name = "dls_100_unique.csv"
+    output_file_name = "solubility_comparison.csv"
     task_list = ['measured log(solubility:mol/L)']
 
     print("=====ESOL=====")
@@ -122,7 +123,8 @@ def main():
     output_df["RF"] = rf_df["pred_vals"]
     output_df["Weave"] = weave_df["pred_vals"]
     output_df["GC"] = gc_df["pred_vals"]
-    output_df.to_csv("solubility_comparison.csv", index=False, float_format="%0.2f")
+    output_df.to_csv(output_file_name, index=False, float_format="%0.2f")
+    print("wrote results to", output_file_name)
 
 
 if __name__ == "__main__":
