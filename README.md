@@ -19,11 +19,12 @@ See the [DeepChem](https://github.com/deepchem/deepchem) site for installation i
 
 * evaluate_results.py - compares results calculated in solubility_comparison.py and generates a couple of plots. Requires matplotlib and and scipy. 
 
-* confidence_interval_vs_correlation.py - generates a plot showing the relationship between correlation, number of
-datapoints and confidence intervals.
 ```
 pip install matplotlib scipy
 ```
+
+* confidence_interval_vs_correlation.py - generates a plot showing the relationship between correlation, number of
+datapoints and confidence intervals. Same requirements as evaluate_results.py.
 
 The repo also contains 2 datafiles. 
 
