@@ -85,6 +85,13 @@ def test_on_dls_100():
 
 
 def add_esol_descriptors_to_dataframe(df,smiles_col="SMILES",name_col="Compound ID"):
+    """
+    Add ESOL descriptors to a Pandas dataframe
+    :param df: input dataframe
+    :param smiles_col: column in the dataframe with SMILES
+    :param name_col: column with the molecule names
+    :return: dataframe and list of columns that were added
+    """
     esol_calculator = ESOLCalculator()
     PandasTools.AddMoleculeColumnToFrame(df, smiles_col, 'Molecule', includeFingerprints=False)
     result_list = []
@@ -98,12 +105,15 @@ def add_esol_descriptors_to_dataframe(df,smiles_col="SMILES",name_col="Compound 
     return df, descriptor_cols
 
 
-def refit_esol(truth_col):
+def refit_esol(input_file_name, truth_col):
     """
     Refit the parameters for ESOL using multiple linear regression
+    Prints parameters that can be pasted into the calc_esol function
+    :input_file_name: input file
+    :truth_col: column with the experimental value
     :return: None
     """
-    df = pd.read_csv("delaney.csv")
+    df = pd.read_csv(input_file_name)
     df, descriptor_cols = add_esol_descriptors_to_dataframe(df)
     x = df[descriptor_cols]
     y = df[[truth_col]]
@@ -121,7 +131,7 @@ def demo(truth_col):
     """
     Read the csv file from the Delaney supporting information, calculate ESOL using the data file from the
     supporting material using the original and refit coefficients.  Write a csv file comparing with experiment.
-    :return:
+    :return: None
     """
     esol_calculator = ESOLCalculator()
     df = pd.read_csv("delaney.csv")
@@ -135,7 +145,7 @@ def demo(truth_col):
 
 def main():
     truth_col = "measured log(solubility:mol/L)"
-    refit_esol(truth_col)
+    refit_esol("delaney.csv", truth_col)
     demo(truth_col)
 
 
