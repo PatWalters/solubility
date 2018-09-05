@@ -7,7 +7,7 @@ John S. Delaney, J. Chem. Inf. Comput. Sci., 2004, 44, 1000 - 1005
 https://pubs.acs.org/doi/abs/10.1021/ci034243x
 ```
 
-There are 3 scripts in this repo. 
+There are 4 scripts in this repo. 
 
 * esol.py - has the routines to calculate ESOL and few associated utility functions.
 Depends on the RDKit, pandas and scikit learn, all of which are part of the RDKit distribution.
@@ -18,6 +18,9 @@ Graph Convolution).  Requires a DeepChem installation.
 See the [DeepChem](https://github.com/deepchem/deepchem) site for installation instructions.
 
 * evaluate_results.py - compares results calculated in solubility_comparison.py and generates a couple of plots. Requires matplotlib and and scipy. 
+
+* confidence_interval_vs_correlation.py - generates a plot showing the relationship between correlation, number of
+datapoints and confidence intervals.
 ```
 pip install matplotlib scipy
 ```
