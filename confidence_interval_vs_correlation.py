@@ -9,7 +9,7 @@ plt.switch_backend("agg")
 
 
 # Generate a figure showing the relationship between correlation, number of datapoints and
-# and the confidence interval
+# the confidence interval
 
 
 def generate_points(r_squared, min_val=5, max_val=100):
