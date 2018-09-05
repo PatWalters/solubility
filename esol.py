@@ -69,6 +69,8 @@ def test_on_dls_100():
     Test on the dls_100 dataset from the University of St Andrews
     https://doi.org/10.17630/3a3a5abc-8458-4924-8e6c-b804347605e8
     This function downloads the Excel spreadhsheet from St Andrews, does the
+    comparison.  Note that this does not remove the structures in DLS-100 that are
+    also in the training set.
     :return: None
     """
     esol_calculator = ESOLCalculator()
