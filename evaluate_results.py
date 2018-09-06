@@ -69,20 +69,21 @@ def draw_histogram(input_df, title, outfile_name, name_col, val_col, lb_col=None
     :param lb_col: lower bound column
     :return: None
     """
+
     fig, ax = plt.subplots()
 
     xlab = input_df[name_col]
     y_val = input_df[val_col]
+
     if ub_col and lb_col:
-        lb = input_df[lb_col].values
-        ub = input_df[ub_col].values
-        error = ub - lb
-    else:
-        error = None
+        lb = y_val - input_df[lb_col].values
+        ub = input_df[ub_col].values - y_val
     x_pos = np.arange(len(xlab))
 
     ax.set_title(title)
-    ax.bar(x_pos, y_val, yerr=error, align='center', alpha=0.5, ecolor='black', capsize=10)
+    ax.bar(x_pos, y_val, yerr=None, align='center', alpha=0.5)
+    if lb_col:
+        ax.errorbar(x_pos,y_val,yerr=[lb,ub],fmt="none",capsize=10,color='black')
     ax.set_ylabel(val_col)
     ax.set_xticks(x_pos)
     ax.set_xticklabels(xlab)
